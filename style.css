@@ -1,0 +1,15 @@
+body{
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 70px;
+}
+
+button{
+    padding: 20px 15px;
+    font-size: 20px;
+}
+
+#nummer{
+    font-size: 50px;
+    margin-top: 25px 0;
+}
