@@ -13,15 +13,18 @@ let bonusMeddelande = "";
 let meddelandeText = "";
 let count = 0;
 
+
 Multi10.addEventListener("click", function(){
     count *= 10;
     nummer.textContent = count;
+    Färg();
 });
 
 
 Mult5.addEventListener("click", function(){
     count *= 5;
     nummer.textContent = count;
+    Färg();
 });
 
 
