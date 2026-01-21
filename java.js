@@ -6,10 +6,18 @@ const meddelande = document.getElementById("meddelande")
 const meddelande2 = document.getElementById("meddelande2")
 const Öka5 = document.getElementById("Öka5")
 const Mult5 = document.getElementById("*5")
+const Multi10 = document.getElementById("*10")
+
 
 let bonusMeddelande = "";
 let meddelandeText = "";
 let count = 0;
+
+Multi10.addEventListener("click", function()){
+    count *= 10;
+    nummer.textContent = count;
+}
+
 
 Mult5.addEventListener("click", function(){
     count *= 5;
