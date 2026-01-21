@@ -5,11 +5,17 @@ const reset = document.getElementById("återställa")
 const meddelande = document.getElementById("meddelande")
 const meddelande2 = document.getElementById("meddelande2")
 const Öka5 = document.getElementById("Öka5")
-
+const Mult5 = document.getElementById("*5")
 
 let bonusMeddelande = "";
 let meddelandeText = "";
 let count = 0;
+
+Mult5.addEventListener("click", function(){
+    count *= 5;
+    nummer.textContent = count;
+});
+
 
 plus.addEventListener("click", function(){
     count++;
@@ -42,6 +48,9 @@ reset.addEventListener("click", function(){
     loggaMeddelande();
     Bonus();
 });
+
+
+
 
 
 function färgändring(){
