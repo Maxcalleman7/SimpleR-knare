@@ -13,10 +13,10 @@ let bonusMeddelande = "";
 let meddelandeText = "";
 let count = 0;
 
-Multi10.addEventListener("click", function()){
+Multi10.addEventListener("click", function(){
     count *= 10;
     nummer.textContent = count;
-}
+});
 
 
 Mult5.addEventListener("click", function(){
@@ -31,6 +31,7 @@ plus.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
+    Färg();
 
 });
 minus.addEventListener("click", function(){
@@ -39,6 +40,7 @@ minus.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
+    Färg();
 });
 reset.addEventListener("click", function(){
     count = 0;
@@ -46,7 +48,7 @@ reset.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    
+    Färg();
 });
 
 Öka5.addEventListener("click", function(){
@@ -55,10 +57,8 @@ reset.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
+    Färg();
 });
-
-
-
 
 
 function färgändring(){
@@ -83,14 +83,24 @@ function loggaMeddelande(){
 }
 
 function Bonus(){
-    if (count > 10){
+    if (count > 0){
         bonusMeddelande = "Du har nått ett högt positivt tal!";
     }
-    else if (count < -10){
+    else if (count < 0){
         bonusMeddelande = "Du har nått ett lågt negativt tal!";
     }
     meddelande2.textContent = bonusMeddelande;
 }
+
+function Färg(){
+    if(count > 100){
+        document.body.style.backgroundColor = "blue";
+    }
+    else if (count < 100){
+        document.body.style.backgroundColor = "aqua"
+    }
+}
+
 
 
 
