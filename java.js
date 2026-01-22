@@ -96,10 +96,10 @@ function Bonus(){
 }
 
 function Färg(){
-    if(count > 100){
+    if(count > 10){
         document.body.style.backgroundColor = "blue";
     }
-    else if (count < 100){
+    else if (count < -10){
         document.body.style.backgroundColor = "aqua"
     }
 }
