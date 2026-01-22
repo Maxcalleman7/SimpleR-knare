@@ -7,6 +7,8 @@ const meddelande2 = document.getElementById("meddelande2")
 const Öka5 = document.getElementById("Öka5")
 const Mult5 = document.getElementById("*5")
 const Multi10 = document.getElementById("*10")
+const Windows = document.getElementById("Windows")
+const sounde = new Audio("Windows XP Error Sound.mp3");
 
 
 let bonusMeddelande = "";
@@ -61,7 +63,15 @@ reset.addEventListener("click", function(){
     loggaMeddelande();
     Bonus();
     Färg();
+    sounde.play();
 });
+
+
+
+sounde.addEventListener("click", function(){
+    sounde.play();
+});
+
 
 
 function färgändring(){
@@ -95,14 +105,9 @@ function Bonus(){
     meddelande2.textContent = bonusMeddelande;
 }
 
-function Färg(){
-    if(count > 10){
-        document.body.style.backgroundColor = "blue";
-    }
-    else if (count < -10){
-        document.body.style.backgroundColor = "aqua"
-    }
-}
+
+
+
 
 
 
