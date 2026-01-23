@@ -1,16 +1,28 @@
-body{
+body, html{
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 70px;
     background-color: aqua;
+    height: 100%;
 }
 
 button{
     padding: 20px 15px;
     font-size: 20px;
+    color: black;
+
 }
 
 #nummer{
     font-size: 50px;
     margin-top: 25px 0;
+}
+
+.Bg{
+    background-image: url("flight-flight-reacts.png");
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    
 }
