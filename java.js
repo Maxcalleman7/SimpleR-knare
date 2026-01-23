@@ -19,14 +19,14 @@ let count = 0;
 Multi10.addEventListener("click", function(){
     count *= 10;
     nummer.textContent = count;
-    Färg();
+
 });
 
 
 Mult5.addEventListener("click", function(){
     count *= 5;
     nummer.textContent = count;
-    Färg();
+    
 });
 
 
@@ -36,7 +36,7 @@ plus.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    Färg();
+    sounde.play();
 
 });
 minus.addEventListener("click", function(){
@@ -45,7 +45,7 @@ minus.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    Färg();
+    
 });
 reset.addEventListener("click", function(){
     count = 0;
@@ -53,7 +53,7 @@ reset.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    Färg();
+    
 });
 
 Öka5.addEventListener("click", function(){
@@ -62,8 +62,7 @@ reset.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    Färg();
-    sounde.play();
+    
 });
 
 
