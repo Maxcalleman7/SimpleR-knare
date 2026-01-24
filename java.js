@@ -8,12 +8,16 @@ const Öka5 = document.getElementById("Öka5")
 const Mult5 = document.getElementById("*5")
 const Multi10 = document.getElementById("*10")
 const Windows = document.getElementById("Windows")
-var sound = new Audio("Windows XP Error Sound.mp3");
+const partyMode = document.getElementById("partyMode")
+const epsteinBtn = document.getElementById("epstein")
+const epsteinPopup = document.getElementById("epsteinPopup")
+const closeBtn = epsteinPopup ? epsteinPopup.querySelector(".close") : null
 
 
 let bonusMeddelande = "";
 let meddelandeText = "";
 let count = 0;
+let audioInstances = []; // Track all audio instances
 
 
 Multi10.addEventListener("click", function(){
@@ -68,19 +72,11 @@ reset.addEventListener("click", function(){
 
 function play() {   
     const newSound = new Audio("Windows XP Error Sound.mp3");
+    audioInstances.push(newSound);
     newSound.play();
   }
 
 
-function färgändring(){
-if (count > 0){
-    nummer.style.color = "green";
-}else if (count < 0 ){
-    nummer.style.color = "red";
-}else {
-    nummer.style.color = "black";
-}
-}
 
 function loggaMeddelande(){
     if (count > 0){
@@ -103,16 +99,66 @@ function Bonus(){
     meddelande2.textContent = bonusMeddelande;
 }
 
+partyMode.addEventListener("click", function(){
+    let time = 0;
 
+    const ernSound = new Audio("ern.mp3");
+    audioInstances.push(ernSound);
+    ernSound.play();
+    
+function animate() {
+  time += 0.01;
 
+  const r = Math.floor(128 + 127 * Math.sin(time));
+  const g = Math.floor(128 + 127 * Math.sin(time + 2));
+  const b = Math.floor(128 + 127 * Math.sin(time + 4));
 
+  document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+  requestAnimationFrame(animate);
+}
 
+animate();
+});
 
+epsteinBtn.addEventListener("click", function(){
+    // Show popup
+    if (epsteinPopup) {
+        epsteinPopup.style.display = "block";
+    }
+});
 
+// Close popup when clicking the X
+if (closeBtn) {
+    closeBtn.addEventListener("click", function(){
+        epsteinPopup.style.display = "none";
+    });
+}
 
+// Close popup when clicking outside of it
+if (epsteinPopup) {
+    window.addEventListener("click", function(event){
+        if (event.target == epsteinPopup) {
+            epsteinPopup.style.display = "none";
+        }
+    });
+}
 
+// Stop all audio function
+function stopAllAudio() {
+    audioInstances.forEach(function(audio) {
+        if (audio && !audio.paused) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
+    // Clear the array after stopping
+    audioInstances = [];
+}
 
-
-
-
-
+// Add event listener for stop all audio button
+const stopAllAudioBtn = document.getElementById("stopAllAudio");
+if (stopAllAudioBtn) {
+    stopAllAudioBtn.addEventListener("click", function(){
+        stopAllAudio();
+    });
+}

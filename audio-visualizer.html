@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Pulse Visualizer (Local File Support)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+        }
+
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .content-box {
+            text-align: center;
+            border: 2px dashed #0ff;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 1rem 0;
+            text-shadow: 0 0 10px #0ff;
+            color: #fff;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: transparent;
+            color: #0ff;
+            border: 1px solid #0ff;
+            padding: 10px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .btn:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        .btn.secondary {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .btn.secondary:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        /* Drag over effect */
+        body.drag-over #overlay {
+            background: rgba(0, 255, 255, 0.2);
+        }
+        body.drag-over .content-box {
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        input[type="file"] { display: none; }
+        
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        #imageStatus {
+            font-size: 0.8rem;
+            color: #0f0;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <div class="content-box">
+            <h1>Neon Pulse</h1>
+            <p>Drag & Drop your <b>Music</b> and <b>Image</b> here</p>
+            
+            <div class="button-group">
+                <label for="fileInput" class="btn">Select Music</label>
+                <input type="file" id="fileInput" accept="audio/*">
+                
+                <label for="imageInput" class="btn secondary">Select Image</label>
+                <input type="file" id="imageInput" accept="image/*">
+                <div id="imageStatus">Custom image loaded!</div>
+            </div>
+            
+            <p id="statusText" style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">Ready for media...</p>
+            <div id="errorMsg" class="error-msg"></div>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        /**
+         * CONFIGURATION
+         */
+        const CONFIG = {
+            // Default placeholder image
+            imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABCFBMVEUAAAD///8A/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAA/wAAr/XFAAAAVHRSTlMAmA0K7/W8F/H09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PRjR9xVAAAAAWJLR0QAiAUdSAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAAd0SU1FB+kBEgIrK/0/oSwAAAIjSURBVHja7dvZctMwEIZh844T105I2uQoBdq53/8Bq002Y0+2o5mRyP43M/i+0WiyLMuXFwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALxW0/R6tWp6/d/89Hq73e/32+vT68F55/V4PO68Hpx3Xk+n087rwXnn9Xw+77wenHdeL5fLzuvBeff19/V63X09OO+8/t7v9zuvB+ed1/P5vPN6cN55vVwun68/u68H553X0+m083pw3nk9Ho87rwfnnXf9dDrtvB6cd17P5/PO68F55/VyuVw/3+y+Hpx3Xk+n087rwXnn9Xg87rwenHde/9/v9zuvB+ed1/P5vPN6cN55vVwuu68H593X39frdff14Lzz+nu/3++8Hpx3Xs/n887rwXnn9XK5fL7+7L4enHdeT6fTzuvBeef1eDzu/9/W9fq683pw3nk9nU47rwfnnXf9fD7vvB6cd14vl8v1883u68F55/V0Ou28Hpx3Xo/H487rwXnn9f/9fr/zenDeef2/Pp/PO68H553Xy+Wy+3pw3n39fb1ed18Pzjuvv/f7/c7rwXnn9Xw+77wenHdeL5fL5+vP7uvBeef1dDrvvB6cd16Px+PO68F5510/nU47rwfnnXf9fD7vvB6cd14vl8v1883u68F55/V0Ou28Hpx3Xo/H487rwXnn9f/9fr/zenDeeT2fzzuvB+ed18vlsve6+3pw3n09/d919/XgvPN6/f115/XgvPN6PB53Xg8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD45z8h2y05zJjZ+AAAAABJRU5ErkJggg==',
+            
+            // Visualizer settings
+            smoothing: 0.85,
+            fftSize: 512,
+            barCount: 120,
+            shakeThreshold: 230,
+            shakeStrength: 5
+        };
+
+        // DOM Elements
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const fileInput = document.getElementById('fileInput');
+        const imageInput = document.getElementById('imageInput');
+        const statusText = document.getElementById('statusText');
+        const imageStatus = document.getElementById('imageStatus');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Audio Variables
+        let audioCtx;
+        let audioSource;
+        let analyser;
+        let audio;
+        let isPlaying = false;
+        let dataArray;
+        let bufferLength;
+
+        // Visual Assets
+        const centerImage = new Image();
+        let imageLoaded = false;
+
+        // --- RESIZE HANDLER ---
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- LOAD INITIAL IMAGE ---
+        centerImage.src = CONFIG.imageUrl;
+        centerImage.onload = () => { imageLoaded = true; };
+
+        // --- AUDIO ENGINE ---
+        async function initAudio(fileBlob) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                if (audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+
+                if (audio) {
+                    audio.pause();
+                    audio.remove();
+                }
+                
+                audio = new Audio();
+                audio.src = URL.createObjectURL(fileBlob);
+                audio.loop = true;
+
+                if (!analyser) {
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = CONFIG.fftSize;
+                    bufferLength = analyser.frequencyBinCount;
+                    dataArray = new Uint8Array(bufferLength);
+                }
+
+                audioSource = audioCtx.createMediaElementSource(audio);
+                audioSource.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                await audio.play();
+                isPlaying = true;
+                
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 500);
+
+                animate();
+
+            } catch (err) {
+                console.error("Audio Error:", err);
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Error playing file. Use an MP3 or WAV.";
+            }
+        }
+
+        // --- FILE HANDLING ---
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.type.startsWith('audio/')) {
+                    statusText.innerText = `Loading Audio: ${file.name}`;
+                    initAudio(file);
+                } else if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        centerImage.src = e.target.result;
+                        imageStatus.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerText = "Unsupported file type.";
+                }
+            }
+        }
+
+        // --- INPUT LISTENERS ---
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        imageInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        // --- DRAG & DROP ---
+        const dropZone = document.body;
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        dropZone.addEventListener('dragenter', () => document.body.classList.add('drag-over'));
+        dropZone.addEventListener('dragover', () => document.body.classList.add('drag-over'));
+        dropZone.addEventListener('dragleave', () => document.body.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => {
+            document.body.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // --- VISUALIZER LOOP ---
+        function animate() {
+            if (!isPlaying) return;
+            requestAnimationFrame(animate);
+
+            analyser.getByteFrequencyData(dataArray);
+
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            let bassTotal = 0;
+            let bassCount = Math.floor(bufferLength * 0.1); 
+            for (let i = 0; i < bassCount; i++) {
+                bassTotal += dataArray[i];
+            }
+            const avgBass = bassTotal / bassCount;
+
+            ctx.save(); 
+            if (avgBass > CONFIG.shakeThreshold) {
+                const shakeX = (Math.random() - 0.5) * CONFIG.shakeStrength * (avgBass / 255) * 5;
+                const shakeY = (Math.random() - 0.5) * CONFIG.shakeStrength * (avgBass / 255) * 5;
+                ctx.translate(shakeX, shakeY);
+            }
+
+            if (imageLoaded) {
+                const baseScale = 200;
+                const scaleFactor = 1 + (avgBass / 255) * 0.4;
+                const size = baseScale * scaleFactor;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                
+                // Draw image maintaining aspect ratio
+                const aspect = centerImage.width / centerImage.height;
+                let drawW = size;
+                let drawH = size;
+                if (aspect > 1) drawW = size * aspect;
+                else drawH = size / aspect;
+
+                ctx.drawImage(centerImage, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+                ctx.restore();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+                ctx.shadowBlur = 20 + (avgBass / 3);
+                ctx.shadowColor = `hsl(${avgBass + 160}, 100%, 50%)`;
+                ctx.strokeStyle = `rgba(0, 255, 255, ${avgBass / 255})`;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            const radius = 120 + (avgBass / 255) * 40;
+            const angleStep = (Math.PI * 2) / CONFIG.barCount;
+
+            for (let i = 0; i < CONFIG.barCount; i++) {
+                const dataIndex = Math.floor((i / CONFIG.barCount) * (bufferLength * 0.6)); 
+                const value = dataArray[dataIndex];
+                const barHeight = Math.max(5, value * 1.5); 
+                
+                // Map frequency to color: lower frequencies (bass) = red/orange, mid = yellow/green, high = blue/purple
+                // dataIndex represents frequency bin (0 = lowest, bufferLength = highest)
+                const frequencyRatio = dataIndex / bufferLength;
+                let hue;
+                if (frequencyRatio < 0.33) {
+                    // Low frequencies (bass): Red to Orange (0-60 degrees)
+                    hue = frequencyRatio * 180; // 0-60
+                } else if (frequencyRatio < 0.66) {
+                    // Mid frequencies: Yellow to Green (60-180 degrees)
+                    hue = 60 + (frequencyRatio - 0.33) * 360; // 60-180
+                } else {
+                    // High frequencies: Cyan to Purple (180-300 degrees)
+                    hue = 180 + (frequencyRatio - 0.66) * 360; // 180-300
+                }
+                
+                // Adjust saturation and lightness based on amplitude
+                const saturation = 70 + (value / 255) * 30; // 70-100%
+                const lightness = 40 + (value / 255) * 30; // 40-70%
+                const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(i * angleStep);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = color;
+                ctx.fillStyle = color;
+                ctx.fillRect(-2, radius, 4, barHeight);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+    </script>
+</body>
+</html>
