@@ -2,7 +2,6 @@ body, html{
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 70px;
-    background-color: aqua;
     height: 100%;
 }
 
@@ -11,6 +10,11 @@ button{
     font-size: 20px;
     color: black;
 
+}
+
+.titel{
+    font-size: 60px;
+    margin-bottom: 20px;
 }
 
 #nummer{
@@ -25,4 +29,56 @@ button{
     background-repeat: no-repeat;
     background-position: center;
     
+}
+
+/* Popup styles */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.popup-content {
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-align: center;
+}
+
+.popup-content iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+}
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+    z-index: 1001;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
 }
