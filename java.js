@@ -8,7 +8,7 @@ const Öka5 = document.getElementById("Öka5")
 const Mult5 = document.getElementById("*5")
 const Multi10 = document.getElementById("*10")
 const Windows = document.getElementById("Windows")
-const sounde = new Audio("Windows XP Error Sound.mp3");
+var sound = new Audio("Windows XP Error Sound.mp3");
 
 
 let bonusMeddelande = "";
@@ -36,7 +36,7 @@ plus.addEventListener("click", function(){
     färgändring();
     loggaMeddelande();
     Bonus();
-    sounde.play();
+    play();
 
 });
 minus.addEventListener("click", function(){
@@ -66,11 +66,10 @@ reset.addEventListener("click", function(){
 });
 
 
-
-sounde.addEventListener("click", function(){
-    sounde.play();
-});
-
+function play() {   
+    const newSound = new Audio("Windows XP Error Sound.mp3");
+    newSound.play();
+  }
 
 
 function färgändring(){
