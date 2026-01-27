@@ -12,6 +12,7 @@ const partyMode = document.getElementById("partyMode")
 const epsteinBtn = document.getElementById("epstein")
 const epsteinPopup = document.getElementById("epsteinPopup")
 const closeBtn = epsteinPopup ? epsteinPopup.querySelector(".close") : null
+const geekBtn = document.getElementById("Geek")
 
 
 let bonusMeddelande = "";
@@ -71,7 +72,7 @@ reset.addEventListener("click", function(){
 
 
 function play() {   
-    const newSound = new Audio("Windows XP Error Sound.mp3");
+    const newSound = new Audio("audio/Windows XP Error Sound.mp3");
     audioInstances.push(newSound);
     newSound.play();
   }
@@ -102,7 +103,7 @@ function Bonus(){
 partyMode.addEventListener("click", function(){
     let time = 0;
 
-    const ernSound = new Audio("ern.mp3");
+    const ernSound = new Audio("audio/ern.mp3");
     audioInstances.push(ernSound);
     ernSound.play();
     
@@ -116,6 +117,9 @@ function animate() {
   document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
   requestAnimationFrame(animate);
 }
+
+
+
 
 animate();
 });
@@ -162,3 +166,10 @@ if (stopAllAudioBtn) {
         stopAllAudio();
     });
 }
+
+geekBtn.addEventListener("click", function(){
+    const geeked = new Audio("audio/Odd fellow.mp3");
+    audioInstances.push(geeked);
+    geeked.play();
+    
+});
